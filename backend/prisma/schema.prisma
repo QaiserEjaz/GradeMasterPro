@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  password     String
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  profile      Profile?
+  calculations Calculation[]
+  insights     Insight[]
+}
+
+model Profile {
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id])
+  country        String
+  educationLevel String
+  institution    String?
+  major          String?
+  graduationYear Int?
+  gradingSystem  String
+  preferences    Json?
+}
+
+model Calculation {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  title         String
+  gradingSystem String
+  totalCredits  Float
+  cgpa          Float?
+  gpa           Float?
+  percentage    Float?
+  qualityPoints Float?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  semesters     Semester[]
+  insights      Insight[]
+}
+
+model Semester {
+  id             String      @id @default(cuid())
+  calculationId  String
+  calculation    Calculation @relation(fields: [calculationId], references: [id])
+  semesterNumber Int
+  semesterName   String
+  year           Int?
+  gpa            Float?
+  credits        Float
+  qualityPoints  Float?
+  courses        Course[]
+}
+
+model Course {
+  id            String   @id @default(cuid())
+  semesterId    String
+  semester      Semester @relation(fields: [semesterId], references: [id])
+  courseName    String
+  courseCode    String?
+  credits       Float
+  gradeValue    String
+  gradePoints   Float
+  qualityPoints Float
+  category      String?
+  isPassed      Boolean  @default(true)
+}
+
+model Insight {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  calculationId String
+  calculation   Calculation @relation(fields: [calculationId], references: [id])
+  type          String
+  content       String
+  metadata      Json?
+  createdAt     DateTime    @default(now())
+}
+
+
