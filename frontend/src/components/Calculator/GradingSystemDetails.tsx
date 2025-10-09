@@ -6,7 +6,7 @@ interface GradingSystemDetailsProps {
 
 export function GradingSystemDetails({ system }: GradingSystemDetailsProps) {
   return (
-    <div className="mt-3 rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div className="flex h-full flex-col rounded-lg border border-gray-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
         <div>
           <p className="text-sm font-semibold text-gray-800">Grade Scale</p>
@@ -14,7 +14,7 @@ export function GradingSystemDetails({ system }: GradingSystemDetailsProps) {
         </div>
         <span className="text-xs font-medium text-gray-500">{system.grades.length} entries</span>
       </div>
-      <div className="max-h-60 overflow-auto">
+      <div className="flex-1 overflow-auto">
         <table className="min-w-full text-left text-xs text-gray-600">
           <thead className="bg-gray-50 text-[11px] uppercase tracking-wide text-gray-500">
             <tr>

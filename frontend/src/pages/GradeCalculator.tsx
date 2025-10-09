@@ -94,15 +94,15 @@ export function GradeCalculator() {
 
   return (
     <div className="bg-slate-50">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-10 lg:pt-10">
-          <header className="mb-10 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:flex lg:items-center lg:justify-between">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-10 lg:pt-8">
+          <header className="mb-8 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:mb-6 lg:flex lg:items-center lg:justify-between">
             <div className="max-w-3xl space-y-3">
               <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">Grade Calculator</h1>
               <p className="text-sm text-slate-600 sm:text-base">
                 Build multi-semester academic plans, switch between international grading systems, and instantly review quality points and GPA outcomes.
               </p>
             </div>
-            <div className="mt-6 flex flex-wrap gap-3 text-xs text-slate-500 lg:mt-0 lg:justify-end">
+            <div className="mt-6 flex flex-wrap gap-2.5 text-xs text-slate-500 lg:mt-0 lg:justify-end">
               <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden /> Real-time calculations
               </span>
@@ -112,7 +112,7 @@ export function GradeCalculator() {
             </div>
           </header>
 
-        <div className="flex flex-1 flex-col gap-6 md:gap-8">
+        <div className="flex flex-1 flex-col gap-5 md:gap-6 lg:gap-5">
           {currentCalculation && (
             <ResultsDisplay
               results={{
@@ -127,42 +127,41 @@ export function GradeCalculator() {
             />
           )}
 
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
-                <p className="mt-1 text-xs text-slate-500">Calculate, save, or reset your academic plan.</p>
+          <div className="grid gap-5 md:gap-5 lg:gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] lg:items-start">
+            <section className="flex flex-col gap-5">
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-none">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
+                    <p className="mt-1 text-xs text-slate-500">Calculate, save, or reset your academic plan.</p>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:gap-3">
+                    <button
+                      onClick={handleCalculate}
+                      className="rounded-lg bg-emerald-500 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-300"
+                      disabled={!hasSemesters}
+                    >
+                      Calculate Results
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      className="rounded-lg bg-purple-500 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-purple-300"
+                      disabled={!currentCalculation || loading}
+                    >
+                      {loading ? 'Saving…' : 'Save Calculation'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowClearConfirm(true)}
+                      className="rounded-lg border border-slate-300 px-6 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
+                    >
+                      Clear Workspace
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                <button
-                  onClick={handleCalculate}
-                  className="rounded-lg bg-emerald-500 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-300"
-                  disabled={!hasSemesters}
-                >
-                  Calculate Results
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="rounded-lg bg-purple-500 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed disabled:bg-purple-300"
-                  disabled={!currentCalculation || loading}
-                >
-                  {loading ? 'Saving…' : 'Save Calculation'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowClearConfirm(true)}
-                  className="rounded-lg border border-slate-300 px-6 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
-                >
-                  Clear Workspace
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-6 md:gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
-            <section className="space-y-6">
-              <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+              <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm lg:min-h-[420px]">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 lg:flex-none">
                   <div>
                     <h2 className="text-lg font-semibold text-slate-900">Semesters</h2>
                     <p className="text-xs text-slate-500">Manage courses by term and compare credit loads.</p>
@@ -175,9 +174,9 @@ export function GradeCalculator() {
                     Add Semester
                   </button>
                 </div>
-                <div className="max-h-[calc(100vh-24rem)] overflow-y-auto px-5 py-5">
+                <div className="flex-1 overflow-y-auto px-5 py-4 lg:py-5">
                   {hasSemesters ? (
-                    <div className="flex flex-col gap-5 pb-2">
+                    <div className="flex flex-col gap-4 pb-2">
                       {semesters.map((semester, index) => (
                         <SemesterCard
                           key={semester.id || index}
@@ -192,7 +191,7 @@ export function GradeCalculator() {
                       ))}
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center text-sm text-slate-500">
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 sm:p-8 text-center text-sm text-slate-500">
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-3xl text-blue-500 shadow-sm">＋</span>
                       <p className="font-medium">No semesters yet</p>
                       <p className="max-w-md text-xs text-slate-500">Create your first semester to begin tracking courses, credits, and GPA metrics.</p>
@@ -202,8 +201,8 @@ export function GradeCalculator() {
               </div>
             </section>
 
-            <aside className="space-y-6 lg:sticky lg:top-28">
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+            <aside className="space-y-5 lg:sticky lg:top-28 lg:space-y-4">
+              <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:min-h-[420px]">
                 <Dropdown
                   label="Grading System"
                   value={gradingSystem?.id || ''}
@@ -218,7 +217,7 @@ export function GradeCalculator() {
                   }))}
                 />
                 {gradingSystem && (
-                  <div className="mt-3 space-y-3 text-xs text-slate-600">
+                  <div className="mt-2 flex flex-1 flex-col space-y-2 text-xs text-slate-600">
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
                       <div>
                         <p className="text-sm font-semibold text-slate-800">{gradingSystem.name}</p>
@@ -242,7 +241,7 @@ export function GradeCalculator() {
                       <span>{isGradingExpanded ? 'Hide grading scale' : 'View grading scale'}</span>
                       <span aria-hidden>{isGradingExpanded ? '−' : '+'}</span>
                     </button>
-                    <div className={`${isGradingExpanded ? 'block' : 'hidden'} lg:block`}>
+                    <div className={`${isGradingExpanded ? 'block' : 'hidden'} lg:flex-1 lg:block lg:overflow-y-auto`}>
                       <GradingSystemDetails system={gradingSystem} />
                     </div>
                   </div>
