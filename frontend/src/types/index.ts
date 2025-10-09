@@ -14,6 +14,9 @@ export interface Course {
   qualityPoints?: number;
   category?: string;
   isPassed?: boolean;
+  obtainedMarks?: number; // Marks obtained by student
+  maxMarks?: number; // Maximum possible marks
+  inputMode?: 'grade' | 'marks'; // Input mode: direct grade entry or marks-based
 }
 
 export interface Semester {

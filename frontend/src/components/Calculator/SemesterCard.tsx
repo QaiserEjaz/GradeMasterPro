@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CourseRow } from './CourseRow';
-import type { Semester, Course } from '../../types';
+import type { Semester, Course, GradingSystem } from '../../types';
 
 interface SemesterCardProps {
   semester: Semester;
@@ -9,7 +9,7 @@ interface SemesterCardProps {
   onAddCourse: () => void;
   onUpdateCourse: (courseIndex: number, course: Partial<Course>) => void;
   onRemoveCourse: (courseIndex: number) => void;
-  gradingSystem: { grades: { letter: string; points: number }[] } | null;
+  gradingSystem: GradingSystem | null;
 }
 
 export function SemesterCard({
@@ -108,11 +108,11 @@ export function SemesterCard({
             <span>Courses: {semester.courses.length}</span>
             <span className="font-semibold text-slate-600">Current GPA: {formattedGpa}</span>
           </div>
-          <div className="hidden rounded-lg bg-slate-100 p-2 text-xs font-semibold text-slate-600 sm:grid sm:grid-cols-6 sm:gap-2 sm:text-sm">
+          <div className="hidden rounded-lg bg-slate-100 p-2 text-xs font-semibold text-slate-600 sm:grid sm:grid-cols-[1.8fr_1fr_.8fr_minmax(0,1.9fr)_1.2fr_auto] sm:gap-3 sm:text-sm">
             <div className="truncate">Course Name</div>
             <div className="truncate">Code</div>
             <div className="truncate">Credits</div>
-            <div className="truncate">Grade</div>
+            <div className="truncate">Grade Input</div>
             <div className="truncate">Category</div>
             <div className="truncate text-right">Action</div>
           </div>

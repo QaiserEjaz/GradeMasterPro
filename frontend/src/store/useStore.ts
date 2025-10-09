@@ -68,7 +68,8 @@ export const useStore = create<Store>((set, get) => ({
       courseCode: '',
       credits: 3,
       gradeValue: 'A',
-      category: 'Major'
+      category: 'Major',
+      inputMode: 'grade' // Default to direct grade input for backward compatibility
     };
     newSemesters[semesterIndex].courses.push(newCourse);
     set({ semesters: newSemesters });
