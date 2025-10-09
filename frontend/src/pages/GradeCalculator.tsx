@@ -94,7 +94,7 @@ export function GradeCalculator() {
 
   return (
     <div className="bg-slate-50">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-10 lg:pt-8">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-6 lg:pt-6">
           <header className="mb-8 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:mb-6 lg:flex lg:items-center lg:justify-between">
             <div className="max-w-3xl space-y-3">
               <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">Grade Calculator</h1>
