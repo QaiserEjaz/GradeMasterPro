@@ -1,13 +1,25 @@
 import { Suspense, useState } from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { Calculator } from './pages/Calculator';
+import { FloatingCalculator } from './components/FloatingCalculator';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 
 export default function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const closeMobileMenu = () => setMobileNavOpen(false);
+
+  const handleCalculatorClick = () => {
+    setCalculatorOpen(true);
+  };
+
+  const closeCalculator = () => {
+    setCalculatorOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -63,6 +75,20 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Suspense>
+
+      {/* Floating Calculator Button */}
+      <button
+        onClick={handleCalculatorClick}
+        className="fixed bottom-6 right-6 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300"
+        aria-label="Open Calculator"
+      >
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      </button>
+
+      {/* Floating Calculator Modal */}
+      <FloatingCalculator isOpen={calculatorOpen} onClose={closeCalculator} />
     </div>
   );
 }
