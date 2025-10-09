@@ -25,6 +25,20 @@ export function SemesterCard({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const handleSemesterChange = (field: keyof Semester, value: string | number) => {
+    if (field === 'year') {
+      if (value === '' || value === null) {
+        onUpdate({ year: undefined });
+        return;
+      }
+
+      const numericValue = typeof value === 'number' ? value : Number(value);
+      if (Number.isNaN(numericValue)) return;
+
+      const clampedValue = Math.min(Math.max(numericValue, 1), 10);
+      onUpdate({ year: clampedValue });
+      return;
+    }
+
     onUpdate({ [field]: value });
   };
 
@@ -84,7 +98,9 @@ export function SemesterCard({
                 type="number"
                 placeholder="Year"
                 value={semester.year ?? ''}
-                onChange={(e) => handleSemesterChange('year', Number(e.target.value))}
+                onChange={(e) => handleSemesterChange('year', e.target.value === '' ? '' : Number(e.target.value))}
+                min={1}
+                max={10}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 sm:w-24"
               />
             </div>
