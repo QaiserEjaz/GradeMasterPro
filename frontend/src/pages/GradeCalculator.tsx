@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ConfirmationModal } from '../components/ConfirmationModal';
+import { Dropdown } from '../components/ui/Dropdown';
 import { useStore } from '../store/useStore';
 import { SemesterCard } from '../components/Calculator/SemesterCard';
 import { ResultsDisplay } from '../components/Calculator/ResultsDisplay';
@@ -7,7 +8,7 @@ import { GradingSystemDetails } from '../components/Calculator/GradingSystemDeta
 import { gradingAPI } from '../services/api';
 import type { GradingSystem } from '../types';
 
-export function Calculator() {
+export function GradeCalculator() {
   const {
     semesters,
     gradingSystem,
@@ -203,21 +204,19 @@ export function Calculator() {
 
             <aside className="space-y-6 lg:sticky lg:top-28">
               <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">Grading System</label>
-                <select
+                <Dropdown
+                  label="Grading System"
                   value={gradingSystem?.id || ''}
-                  onChange={(e) => {
-                    const system = availableSystems.find(s => s.id === e.target.value);
+                  onChange={(value) => {
+                    const system = availableSystems.find(s => s.id === value);
                     setGradingSystem(system || null);
                   }}
-                  className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {availableSystems.map(system => (
-                    <option key={system.id} value={system.id}>
-                      {system.name}
-                    </option>
-                  ))}
-                </select>
+                  selectClassName="text-sm font-medium"
+                  options={availableSystems.map(system => ({
+                    value: system.id,
+                    label: system.name,
+                  }))}
+                />
                 {gradingSystem && (
                   <div className="mt-3 space-y-3 text-xs text-slate-600">
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">

@@ -1,6 +1,6 @@
 import { Suspense, useState } from 'react';
 import { Link, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
-import { Calculator } from './pages/Calculator';
+import { GradeCalculator } from './pages/GradeCalculator';
 import { FloatingCalculator } from './components/FloatingCalculator';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -40,29 +40,29 @@ export default function App() {
           </button>
           <div className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
             <Link className="transition hover:text-slate-900" to="/" onClick={closeMobileMenu}>Home</Link>
-            <Link className="transition hover:text-slate-900" to="/calculator" onClick={closeMobileMenu}>Calculator</Link>
+            <Link className="transition hover:text-slate-900" to="/grade-calculator" onClick={closeMobileMenu}>Grade Calculator</Link>
             <Link className="transition hover:text-slate-900" to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
           </div>
           <Link
-            to="/calculator"
+            to="/grade-calculator"
             className="hidden items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 md:inline-flex"
             onClick={closeMobileMenu}
           >
-            Launch Calculator
+            Launch Grade Calculator
           </Link>
         </div>
         {mobileNavOpen && (
           <div className="border-t border-slate-200 bg-white/95 px-4 py-3 text-sm text-slate-600 shadow-sm sm:px-6 lg:px-10 md:hidden">
             <div className="flex flex-col gap-3">
               <Link className="transition hover:text-slate-900" to="/" onClick={closeMobileMenu}>Home</Link>
-              <Link className="transition hover:text-slate-900" to="/calculator" onClick={closeMobileMenu}>Calculator</Link>
+              <Link className="transition hover:text-slate-900" to="/grade-calculator" onClick={closeMobileMenu}>Grade Calculator</Link>
               <Link className="transition hover:text-slate-900" to="/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
               <Link
-                to="/calculator"
+                to="/grade-calculator"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
                 onClick={closeMobileMenu}
               >
-                Launch Calculator
+                Launch Grade Calculator
               </Link>
             </div>
           </div>
@@ -71,16 +71,16 @@ export default function App() {
       <Suspense fallback={<div className="p-6">Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/calculator" element={<Calculator />} />
+          <Route path="/grade-calculator" element={<GradeCalculator />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Suspense>
 
-      {/* Floating Calculator Button */}
+      {/* Floating Grade Calculator Button */}
       <button
         onClick={handleCalculatorClick}
         className="fixed bottom-6 right-6 z-[9999] inline-flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:bg-blue-700 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-blue-300"
-        aria-label="Open Calculator"
+        aria-label="Open Grade Calculator"
       >
         <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />

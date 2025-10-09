@@ -1,5 +1,6 @@
-import { useState, type CSSProperties } from 'react';
+import { useState } from 'react';
 import { ConfirmationModal } from '../ConfirmationModal';
+import { Dropdown } from '../ui/Dropdown';
 import type { Course, GradingSystem } from '../../types';
 
 interface CourseRowProps {
@@ -15,35 +16,6 @@ export function CourseRow({ course, onUpdate, onRemove, gradingSystem }: CourseR
   const handleChange = (field: keyof Course, value: string | number) => {
     onUpdate({ [field]: value });
   };
-
-  const dropdownBaseClasses =
-    'w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 pr-10 text-sm text-slate-700 shadow-sm transition-colors hover:border-slate-300 focus:border-blue-300 focus:outline-none focus:ring-1 focus:ring-blue-200';
-
-  const dropdownWrapperClasses = 'relative inline-flex w-full items-center';
-
-  const dropdownOptionStyle: CSSProperties = {
-    backgroundColor: '#ffffff',
-    color: '#1e293b',
-  };
-
-  const dropdownChevron = (
-    <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
-      <svg
-        className="h-4 w-4 drop-shadow-sm"
-        viewBox="0 0 20 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M6 8L10 12L14 8"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
-  );
 
   const handleRemoveConfirm = () => {
     onRemove();
@@ -132,38 +104,30 @@ export function CourseRow({ course, onUpdate, onRemove, gradingSystem }: CourseR
       <div className="flex flex-col gap-3 text-sm text-slate-600 sm:w-full sm:max-w-[280px]">
         <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 sm:hidden">Grade Input</label>
         <div className="space-y-3">
-          <div className="flex flex-col gap-1">
-            <div className={dropdownWrapperClasses}>
-              <select
-                value={currentInputMode}
-                onChange={(e) => handleInputModeChange(e.target.value as 'grade' | 'marks')}
-                className={dropdownBaseClasses}
-              >
-                {/* <option value="" disabled>Input Type</option> */}
-                <option value="grade" style={dropdownOptionStyle}>Direct Grade</option>
-                <option value="marks" style={dropdownOptionStyle}>Calculate from Marks</option>
-              </select>
-              {dropdownChevron}
-            </div>
-          </div>
+          <Dropdown
+            value={currentInputMode}
+            onChange={(value) => handleInputModeChange(value as 'grade' | 'marks')}
+            options={[
+              { value: 'grade', label: 'Direct Grade' },
+              { value: 'marks', label: 'Calculate from Marks' },
+            ]}
+            wrapperClassName="sm:max-w-[280px]"
+            containerClassName="flex flex-col"
+          />
 
           {/* Input Fields */}
           <div className="min-h-[2.5rem] flex items-center">
             {currentInputMode === 'grade' ? (
-              <div className={dropdownWrapperClasses}>
-                <select
-                  value={course.gradeValue}
-                  onChange={(e) => handleChange('gradeValue', e.target.value)}
-                  className={dropdownBaseClasses}
-                >
-                  {gradingSystem?.grades.map((grade) => (
-                    <option key={grade.letter} value={grade.letter} style={dropdownOptionStyle}>
-                      {grade.letter} ({grade.points} points)
-                    </option>
-                  ))}
-                </select>
-                {dropdownChevron}
-              </div>
+              <Dropdown
+                value={course.gradeValue ?? ''}
+                onChange={(value) => handleChange('gradeValue', value)}
+                options={gradingSystem?.grades.map((grade) => ({
+                  value: grade.letter,
+                  label: `${grade.letter} (${grade.points} points)`
+                }))}
+                containerClassName="w-full"
+                wrapperClassName="w-full"
+              />
             ) : currentInputMode === 'marks' ? (
               <div className="w-full space-y-2">
                 <div className="flex items-center gap-2">
@@ -213,22 +177,19 @@ export function CourseRow({ course, onUpdate, onRemove, gradingSystem }: CourseR
           </div>
         </div>
       </div>
-      <div className="grid gap-1 text-sm text-slate-600 sm:flex sm:flex-col">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 sm:hidden">Category</label>
-        <div className={dropdownWrapperClasses}>
-          <select
-            value={course.category || 'Major'}
-            onChange={(e) => handleChange('category', e.target.value)}
-            className={dropdownBaseClasses}
-          >
-            <option value="Major" style={dropdownOptionStyle}>Major</option>
-            <option value="Minor" style={dropdownOptionStyle}>Minor</option>
-            <option value="Elective" style={dropdownOptionStyle}>Elective</option>
-            <option value="General" style={dropdownOptionStyle}>General</option>
-          </select>
-          {dropdownChevron}
-        </div>
-      </div>
+      <Dropdown
+        value={course.category || 'Major'}
+        onChange={(value) => handleChange('category', value)}
+        label="Category"
+        containerClassName="grid gap-1 text-sm text-slate-600 sm:flex sm:flex-col"
+        labelClassName="text-xs font-semibold uppercase tracking-wide text-slate-500 sm:hidden"
+        options={[
+          { value: 'Major', label: 'Major' },
+          { value: 'Minor', label: 'Minor' },
+          { value: 'Elective', label: 'Elective' },
+          { value: 'General', label: 'General' },
+        ]}
+      />
       <div className="flex items-start justify-end sm:justify-end sm:items-start">
         <button
           onClick={() => setShowRemoveConfirm(true)}
