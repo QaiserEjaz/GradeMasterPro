@@ -236,7 +236,7 @@ export function GradeCalculator() {
                     </div>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 transition hover:text-blue-700 focus:outline-none"
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-blue-600 transition hover:text-blue-700 focus:outline-none lg:hidden"
                       onClick={() => setIsGradingExpanded(prev => !prev)}
                     >
                       <span>{isGradingExpanded ? 'Hide grading scale' : 'View grading scale'}</span>
