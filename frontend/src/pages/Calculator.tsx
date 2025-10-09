@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ConfirmationModal } from '../components/ConfirmationModal';
 import { useStore } from '../store/useStore';
 import { SemesterCard } from '../components/Calculator/SemesterCard';
 import { ResultsDisplay } from '../components/Calculator/ResultsDisplay';
@@ -24,6 +25,7 @@ export function Calculator() {
 
   const [availableSystems, setAvailableSystems] = useState<GradingSystem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const hasSemesters = semesters.length > 0;
   const [isGradingExpanded, setIsGradingExpanded] = useState(false);
 
@@ -84,25 +86,30 @@ export function Calculator() {
     }
   };
 
+  const handleClearWorkspace = () => {
+    clearCalculation();
+    setShowClearConfirm(false);
+  };
+
   return (
     <div className="bg-slate-50">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-10 lg:pt-10">
-        <header className="mb-10 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:flex lg:items-center lg:justify-between">
-          <div className="max-w-3xl space-y-3">
-            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">Grade Calculator</h1>
-            <p className="text-sm text-slate-600 sm:text-base">
-              Build multi-semester academic plans, switch between international grading systems, and instantly review quality points and GPA outcomes.
-            </p>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3 text-xs text-slate-500 lg:mt-0 lg:justify-end">
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden /> Real-time calculations
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-blue-500" aria-hidden /> Global grading coverage
-            </span>
-          </div>
-        </header>
+          <header className="mb-10 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:flex lg:items-center lg:justify-between">
+            <div className="max-w-3xl space-y-3">
+              <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">Grade Calculator</h1>
+              <p className="text-sm text-slate-600 sm:text-base">
+                Build multi-semester academic plans, switch between international grading systems, and instantly review quality points and GPA outcomes.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3 text-xs text-slate-500 lg:mt-0 lg:justify-end">
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden /> Real-time calculations
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-blue-500" aria-hidden /> Global grading coverage
+              </span>
+            </div>
+          </header>
 
         <div className="flex flex-1 flex-col gap-6 md:gap-8">
           {currentCalculation && (
@@ -141,7 +148,8 @@ export function Calculator() {
                   {loading ? 'Saving…' : 'Save Calculation'}
                 </button>
                 <button
-                  onClick={clearCalculation}
+                  type="button"
+                  onClick={() => setShowClearConfirm(true)}
                   className="rounded-lg border border-slate-300 px-6 py-2 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300"
                 >
                   Clear Workspace
@@ -245,6 +253,16 @@ export function Calculator() {
           </div>
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={showClearConfirm}
+        title="Clear entire workspace?"
+        description="This will remove all semesters, courses, and results."
+        confirmLabel="Clear All"
+        cancelLabel="Keep Data"
+        confirmTone="danger"
+        onConfirm={handleClearWorkspace}
+        onCancel={() => setShowClearConfirm(false)}
+      />
     </div>
   );
 }

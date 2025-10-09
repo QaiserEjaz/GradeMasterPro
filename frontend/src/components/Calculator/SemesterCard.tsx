@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ConfirmationModal } from '../ConfirmationModal';
 import { CourseRow } from './CourseRow';
 import type { Semester, Course, GradingSystem } from '../../types';
 
@@ -22,6 +23,7 @@ export function SemesterCard({
   gradingSystem,
 }: SemesterCardProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const handleSemesterChange = (field: keyof Semester, value: string | number) => {
     onUpdate({ [field]: value });
   };
@@ -96,7 +98,7 @@ export function SemesterCard({
           >
             {isCollapsed ? 'Expand' : 'Collapse'}
           </button>
-          <button onClick={onRemove} className={removeButtonClass}>
+          <button onClick={() => setShowRemoveConfirm(true)} className={removeButtonClass}>
             Remove
           </button>
         </div>
@@ -137,6 +139,19 @@ export function SemesterCard({
           </div>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={showRemoveConfirm}
+        title="Remove this semester?"
+        description="All courses inside will be deleted."
+        confirmLabel="Remove"
+        cancelLabel="Keep"
+        confirmTone="danger"
+        onConfirm={() => {
+          onRemove();
+          setShowRemoveConfirm(false);
+        }}
+        onCancel={() => setShowRemoveConfirm(false)}
+      />
     </div>
   );
 }
