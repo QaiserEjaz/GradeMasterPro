@@ -25,7 +25,7 @@ export function GradingSystemDetails({ system }: GradingSystemDetailsProps) {
             </tr>
           </thead>
           <tbody>
-            {system.grades.map((grade) => (
+            {system.grades.map(grade => (
               <tr key={`${system.id}-${grade.letter}-${grade.minPercentage}`} className="odd:bg-white even:bg-gray-50">
                 <td className="px-4 py-2 font-semibold text-gray-800">{grade.letter}</td>
                 <td className="px-4 py-2 text-gray-700">{grade.points.toFixed(2)}</td>

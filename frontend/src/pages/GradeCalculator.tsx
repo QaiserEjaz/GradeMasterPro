@@ -93,7 +93,7 @@ export function GradeCalculator() {
   };
 
   return (
-    <div className="bg-slate-50">
+    <div className='min-h-screen bg-slate-50'>
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-6 lg:pt-6">
           <header className="mb-8 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:mb-6 lg:flex lg:items-center lg:justify-between">
             <div className="max-w-3xl space-y-3">
@@ -217,7 +217,7 @@ export function GradeCalculator() {
                   }))}
                 />
                 {gradingSystem && (
-                  <div className="mt-2 flex flex-1 flex-col space-y-2 text-xs text-slate-600">
+                  <div className="mt-3 space-y-3 text-xs text-slate-600">
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
                       <div>
                         <p className="text-sm font-semibold text-slate-800">{gradingSystem.name}</p>
@@ -241,7 +241,7 @@ export function GradeCalculator() {
                       <span>{isGradingExpanded ? 'Hide grading scale' : 'View grading scale'}</span>
                       <span aria-hidden>{isGradingExpanded ? '−' : '+'}</span>
                     </button>
-                    <div className={`${isGradingExpanded ? 'block' : 'hidden'} lg:flex-1 lg:block lg:overflow-y-auto`}>
+                    <div className={`${isGradingExpanded ? 'block' : 'hidden'} lg:block`}>
                       <GradingSystemDetails system={gradingSystem} />
                     </div>
                   </div>
