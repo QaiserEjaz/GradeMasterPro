@@ -5,6 +5,16 @@ import { FloatingCalculator } from './components/FloatingCalculator';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
+import Contact from './pages/Contact';
+import Profile from './pages/Profile';
+import SettingsPage from './pages/Settings';
+import Status from './pages/Status';
+import SupportTicket from './pages/SupportTicket';
+import SalesDemo from './pages/SalesDemo';
+import Planner from './pages/Planner';
+import ResourceLibrary from './pages/ResourceLibrary';
+import MeetingAgenda from './pages/MeetingAgenda';
+import ProductTour from './pages/ProductTour';
 
 type ShellProps = {
   children: ReactNode;
@@ -19,6 +29,7 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLoginRoute = location.pathname === '/login';
+  const isHomeRoute = location.pathname === '/';
 
   const closeMobileMenu = () => setMobileNavOpen(false);
 
@@ -26,11 +37,23 @@ export default function App() {
     { label: 'Home', path: '/' },
     { label: 'Grade Calculator', path: '/grade-calculator' },
     { label: 'Dashboard', path: '/dashboard' },
+    { label: 'Planner', path: '/planner' },
+    { label: 'Resources', path: '/resources' },
+    { label: 'Contact', path: '/contact' },
+    { label: 'Product Tour', path: '/product-tour' },
+    { label: 'Meeting Agenda', path: '/meeting-agenda' },
+    { label: 'Profile', path: '/profile' },
+    { label: 'Settings', path: '/settings' },
   ];
 
   useEffect(() => {
     setMobileNavOpen(false);
     setUserMenuOpen(false);
+  }, [location.pathname]);
+
+  // Scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   const handleCalculatorClick = () => {
@@ -42,12 +65,13 @@ export default function App() {
   };
 
   const Shell = ({ children, showSidebar = true, showFloatingCalculator = true }: ShellProps) => {
-    const mainClasses = 'min-w-0 flex-1';
+    const mainClasses = `min-w-0 flex-1${showSidebar ? ' lg:ml-80' : ''}`;
+    const containerClasses = `flex w-full items-stretch ${showSidebar ? 'gap-3 lg:gap-4' : ''} px-4 pb-12 sm:px-6 ${showSidebar ? 'lg:px-9' : 'lg:px-12'}`;
 
     return (
       <>
-        <nav className="pointer-events-none fixed top-6 inset-x-4 z-50 sm:inset-x-6 lg:inset-x-10">
-          <div className="pointer-events-auto rounded-3xl border border-slate-200 bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
+        <nav className="pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-10 lg:pt-6 backdrop-blur">
+          <div className="pointer-events-auto rounded-3xl border border-slate-200 bg-white/90 px-4 py-2 shadow-xl backdrop-blur sm:px-5 lg:px-6">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <button
@@ -91,7 +115,7 @@ export default function App() {
                         type="button"
                         onClick={() => {
                           setUserMenuOpen(false);
-                          navigate('/dashboard');
+                          navigate('/profile');
                         }}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition hover:bg-slate-100 hover:text-slate-800"
                       >
@@ -102,6 +126,7 @@ export default function App() {
                         type="button"
                         onClick={() => {
                           setUserMenuOpen(false);
+                          navigate('/settings');
                         }}
                         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition hover:bg-slate-100 hover:text-slate-800"
                       >
@@ -137,11 +162,11 @@ export default function App() {
                     </Link>
                   ))}
                   <Link
-                    to="/login"
+                    to="/support/ticket"
                     className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
                     onClick={closeMobileMenu}
                   >
-                    Sign in to Grade Master Pro
+                    Submit a ticket
                   </Link>
                 </div>
               </div>
@@ -149,9 +174,9 @@ export default function App() {
           </div>
         </nav>
 
-        <div className="flex w-full items-start gap-6 px-4 pb-16 pt-32 sm:px-6 lg:gap-10 lg:px-10">
+        <div className={containerClasses}>
           {showSidebar && (
-            <aside className="hidden w-72 shrink-0 rounded-3xl border border-slate-200 bg-white/80 px-6 py-8 shadow-sm backdrop-blur lg:flex lg:min-h-[calc(100vh-200px)] lg:flex-col">
+            <aside className="hidden w-72 shrink-0 rounded-3xl border border-slate-200 bg-white/80 px-5 py-6 shadow-sm backdrop-blur lg:fixed lg:left-9 lg:top-28 lg:flex lg:h-[calc(100vh-7.5rem)] lg:flex-col lg:overflow-y-auto">
               <div className="mb-6 text-xs font-semibold uppercase tracking-wide text-slate-500">Navigate</div>
               <div className="flex flex-col gap-1">
                 {navItems.map(item => {
@@ -172,10 +197,10 @@ export default function App() {
                 <h3 className="text-base font-semibold text-blue-700">Need quick grades?</h3>
                 <p className="mt-2 text-xs text-blue-600">Jump into the calculator and start tracking instantly.</p>
                 <Link
-                  to="/login"
+                  to="/grade-calculator"
                   className="mt-4 inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
                 >
-                  Sign In to Continue
+                  Open calculator
                 </Link>
               </div>
             </aside>
@@ -200,13 +225,23 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className={`min-h-screen bg-slate-100 ${isHomeRoute ? 'pt-0' : 'pt-24 lg:pt-28'}`}>
       <Suspense fallback={<div className="p-6">Loading...</div>}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/grade-calculator" element={<Shell><GradeCalculator /></Shell>} />
-          <Route path="/dashboard" element={<Shell><Dashboard /></Shell>} />
+          <Route path="/grade-calculator" element={<Shell showFloatingCalculator={true}><GradeCalculator /></Shell>} />
+          <Route path="/dashboard" element={<Shell showSidebar={true}><Dashboard /></Shell>} />
+          <Route path="/planner" element={<Shell showSidebar={true}><Planner /></Shell>} />
+          <Route path="/resources" element={<Shell showSidebar={true}><ResourceLibrary /></Shell>} />
+          <Route path="/product-tour" element={<Shell showSidebar={true}><ProductTour /></Shell>} />
+          <Route path="/meeting-agenda" element={<Shell showSidebar={true}><MeetingAgenda /></Shell>} />
+          <Route path="/contact" element={<Shell showSidebar={true} showFloatingCalculator={false}><Contact /></Shell>} />
+          <Route path="/support/ticket" element={<Shell showSidebar={false} showFloatingCalculator={false}><SupportTicket /></Shell>} />
+          <Route path="/sales/demo" element={<Shell showSidebar={false} showFloatingCalculator={false}><SalesDemo /></Shell>} />
+          <Route path="/profile" element={<Shell showSidebar={true} showFloatingCalculator={false}><Profile /></Shell>} />
+          <Route path="/settings" element={<Shell showSidebar={true} showFloatingCalculator={false}><SettingsPage /></Shell>} />
+          <Route path="/status" element={<Shell showSidebar={false} showFloatingCalculator={false}><Status /></Shell>} />
         </Routes>
       </Suspense>
 

@@ -1,5 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+const getCalculatorDimensions = () => {
+  if (typeof window === 'undefined') {
+    return { width: 320, height: 420 };
+  }
+  const width = Math.min(320, Math.max(260, window.innerWidth - 32));
+  const height = Math.min(420, Math.max(340, window.innerHeight - 64));
+  return { width, height };
+};
+
 interface FloatingCalculatorProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,9 +23,11 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
   
   const [isDragging, setIsDragging] = useState(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const [dimensions, setDimensions] = useState(getCalculatorDimensions);
   const [position, setPosition] = useState(() => {
-    const centerX = typeof window !== 'undefined' ? window.innerWidth / 2 - 160 : 400;
-    const centerY = typeof window !== 'undefined' ? window.innerHeight / 2 - 200 : 300;
+    const { width, height } = getCalculatorDimensions();
+    const centerX = typeof window !== 'undefined' ? (window.innerWidth - width) / 2 : 400;
+    const centerY = typeof window !== 'undefined' ? (window.innerHeight - height) / 2 : 300;
     return { x: Math.max(0, centerX), y: Math.max(0, centerY) };
   });
 
@@ -31,6 +42,17 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
     };
   }, [position.x, position.y]);
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (!e.touches[0]) return;
+    e.stopPropagation();
+    setIsDragging(true);
+    const touch = e.touches[0];
+    dragOffsetRef.current = {
+      x: touch.clientX - position.x,
+      y: touch.clientY - position.y
+    };
+  }, [position.x, position.y]);
+
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging) return;
     
@@ -38,8 +60,10 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
     const newX = e.clientX - dragOffsetRef.current.x;
     const newY = e.clientY - dragOffsetRef.current.y;
     
-    const maxX = window.innerWidth - 320;
-    const maxY = window.innerHeight - 400;
+    const calculatorWidth = dimensions.width;
+    const calculatorHeight = dimensions.height;
+    const maxX = Math.max(0, window.innerWidth - calculatorWidth);
+    const maxY = Math.max(0, window.innerHeight - calculatorHeight);
     
     const newPosition = {
       x: Math.max(0, Math.min(newX, maxX)),
@@ -47,9 +71,32 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
     };
     
     setPosition(newPosition);
-  }, [isDragging]);
+  }, [isDragging, dimensions]);
 
   const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    const newX = touch.clientX - dragOffsetRef.current.x;
+    const newY = touch.clientY - dragOffsetRef.current.y;
+
+    const calculatorWidth = dimensions.width;
+    const calculatorHeight = dimensions.height;
+    const maxX = Math.max(0, window.innerWidth - calculatorWidth);
+    const maxY = Math.max(0, window.innerHeight - calculatorHeight);
+
+    setPosition({
+      x: Math.max(0, Math.min(newX, maxX)),
+      y: Math.max(0, Math.min(newY, maxY))
+    });
+  }, [isDragging, dimensions]);
+
+  const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
   }, []);
 
@@ -99,15 +146,40 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
     if (isOpen) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
       document.addEventListener('keydown', handleKeyPress);
       
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
         document.removeEventListener('keydown', handleKeyPress);
       };
     }
-  }, [isOpen, handleMouseMove, handleMouseUp, handleKeyPress]);
+  }, [isOpen, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd, handleKeyPress]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDimensions(getCalculatorDimensions());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    setPosition(prev => {
+      if (typeof window === 'undefined') return prev;
+      const maxX = Math.max(0, window.innerWidth - dimensions.width);
+      const maxY = Math.max(0, window.innerHeight - dimensions.height);
+      return {
+        x: Math.max(0, Math.min(prev.x, maxX)),
+        y: Math.max(0, Math.min(prev.y, maxY))
+      };
+    });
+  }, [dimensions]);
 
   const inputNumber = (num: string) => {
     console.log('inputNumber called with:', num, 'current display:', display, 'waitingForOperand:', waitingForOperand);
@@ -231,7 +303,11 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           transform: `translate(${position.x}px, ${position.y}px)`,
           cursor: isDragging ? 'grabbing' : 'default',
           userSelect: 'none',
-          willChange: 'transform'
+          willChange: 'transform',
+          width: dimensions.width,
+          maxWidth: 'calc(100vw - 2rem)',
+          height: dimensions.height,
+          maxHeight: 'calc(100vh - 4rem)'
         }}
       >
         {/* Header - Draggable */}
@@ -239,6 +315,8 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           className="mb-4 flex items-center justify-between cursor-grab active:cursor-grabbing select-none"
           onMouseDown={handleMouseDown}
           onMouseUp={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           <div>
             <h3 className="text-lg font-semibold text-gray-800">Calculator</h3>
@@ -267,25 +345,25 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           {/* Row 1 */}
           <button
             onClick={clear}
-            className="rounded-lg bg-gray-300 p-3 text-sm font-semibold text-gray-700 hover:bg-gray-400"
+            className="rounded-lg bg-gray-300 p-2 text-sm font-semibold text-gray-700 hover:bg-gray-400"
           >
             AC
           </button>
           <button
             onClick={deleteLastDigit}
-            className="rounded-lg bg-gray-300 p-3 text-sm font-semibold text-gray-700 hover:bg-gray-400"
+            className="rounded-lg bg-gray-300 p-2 text-sm font-semibold text-gray-700 hover:bg-gray-400"
           >
             Del
           </button>
           <button
             onClick={() => inputOperation('÷')}
-            className="rounded-lg bg-orange-500 p-3 text-sm font-semibold text-white hover:bg-orange-600"
+            className="rounded-lg bg-orange-500 p-2 text-sm font-semibold text-white hover:bg-orange-600"
           >
             ÷
           </button>
           <button
             onClick={() => inputOperation('×')}
-            className="rounded-lg bg-orange-500 p-3 text-sm font-semibold text-white hover:bg-orange-600"
+            className="rounded-lg bg-orange-500 p-2 text-sm font-semibold text-white hover:bg-orange-600"
           >
             ×
           </button>
@@ -293,25 +371,25 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           {/* Row 2 */}
           <button
             onClick={() => inputNumber('7')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             7
           </button>
           <button
             onClick={() => inputNumber('8')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             8
           </button>
           <button
             onClick={() => inputNumber('9')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             9
           </button>
           <button
             onClick={() => inputOperation('-')}
-            className="rounded-lg bg-orange-500 p-3 text-sm font-semibold text-white hover:bg-orange-600"
+            className="rounded-lg bg-orange-500 p-2 text-sm font-semibold text-white hover:bg-orange-600"
           >
             −
           </button>
@@ -319,25 +397,25 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           {/* Row 3 */}
           <button
             onClick={() => inputNumber('4')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             4
           </button>
           <button
             onClick={() => inputNumber('5')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             5
           </button>
           <button
             onClick={() => inputNumber('6')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             6
           </button>
           <button
             onClick={() => inputOperation('+')}
-            className="rounded-lg bg-orange-500 p-3 text-sm font-semibold text-white hover:bg-orange-600"
+            className="rounded-lg bg-orange-500 p-2 text-sm font-semibold text-white hover:bg-orange-600"
           >
             +
           </button>
@@ -345,25 +423,25 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           {/* Row 4 */}
           <button
             onClick={() => inputNumber('1')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             1
           </button>
           <button
             onClick={() => inputNumber('2')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             2
           </button>
           <button
             onClick={() => inputNumber('3')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             3
           </button>
           <button
             onClick={performCalculation}
-            className="row-span-2 rounded-lg bg-orange-500 p-3 text-sm font-semibold text-white hover:bg-orange-600"
+            className="row-span-2 rounded-lg bg-orange-500 p-2 text-sm font-semibold text-white hover:bg-orange-600"
           >
             =
           </button>
@@ -371,13 +449,13 @@ export function FloatingCalculator({ isOpen, onClose }: FloatingCalculatorProps)
           {/* Row 5 */}
           <button
             onClick={() => inputNumber('0')}
-            className="col-span-2 rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="col-span-2 rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             0
           </button>
           <button
             onClick={() => inputNumber('.')}
-            className="rounded-lg bg-gray-200 p-3 text-sm font-semibold text-gray-800 hover:bg-gray-300"
+            className="rounded-lg bg-gray-200 p-2 text-sm font-semibold text-gray-800 hover:bg-gray-300"
           >
             .
           </button>
