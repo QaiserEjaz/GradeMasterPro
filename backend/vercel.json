@@ -1,9 +1,4 @@
 {
   "version": 2,
-  "buildCommand": "npx prisma generate && npm run build",
-  "functions": {
-    "src/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "buildCommand": "npx prisma generate && npm run build"
 }
