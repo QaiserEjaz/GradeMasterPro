@@ -1,12 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build && npx prisma generate",
-  "public": false,
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "JWT_SECRET": "@jwt_secret",
-    "NODE_ENV": "production"
-  },
+  "buildCommand": "npx prisma generate && npm run build",
   "functions": {
     "src/**/*.ts": {
       "runtime": "nodejs18.x"
