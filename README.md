@@ -38,55 +38,128 @@ GradeMasterPro/
 # clone the repository
 git clone <repo-url>
 cd GradeMasterPro
+## Product Preview
+GradeMaster Pro is a full-stack academic planning platform for calculating GPA and CGPA, comparing international grading systems, tracking progress, and turning academic data into clear next steps.
 
-# install frontend dependencies
-cd frontend
-npm install
+**[Open the live website](https://grade-master-pro-frontend.vercel.app/)**
 
-# install backend dependencies
-cd ../backend
-npm install
-\\\
+![GradeMaster Pro live preview](https://img.shields.io/badge/Live%20Preview-Open%20website-0f766e?style=for-the-badge&logo=vercel&logoColor=white)
+
+## Tech Stack
+
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, Zustand, React Router
+- **Backend:** Node.js, Express, TypeScript, Prisma, PostgreSQL
+- **Tooling:** Docker, Axios, npm, Vercel
+
+
+
+## Repository Structure
+
+```text
+GradeMasterPro/
+├── backend/          # Express API, Prisma schema, services, and Vercel handler
+├── frontend/         # React/Vite application
+├── docs/             # Requirements and reference documentation
+├── docker-compose.yml
+└── README.md
+```
 
 ### Running Locally
 \\\ash
-# start the frontend (http://localhost:5173)
+
+## Run Locally
+
+### Prerequisites
+
+- Node.js 18 or newer
+- npm 9 or newer
+- PostgreSQL instance for the backend
+
+### Install dependencies
+
+```powershell
+git clone https://github.com/QaiserEjaz/GradeMasterPro.git
+cd GradeMasterPro
+
+cd frontend
+npm install
+
+cd ../backend
+npm install
+```
+
+
+
+### Configure environment variables
+
+Create `backend/.env` with at least:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/grade_calculator
+JWT_SECRET=replace-with-a-long-random-secret
+PORT=3000
+```
+
+Create `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+```
+
+### Start the applications
+
+```powershell
+# Terminal 1
+cd backend
+npm run dev
+
+# Terminal 2
 cd frontend
 npm run dev
+```
 
-# start the backend API (http://localhost:3000)
-cd ../backend
-npm run dev
-\\\
+Open `http://localhost:5173` in your browser.
 
-> **Tip:** For a containerized workflow run \docker-compose up --build\ from the project root.
-
-## Environment Setup
-Create \.env\ files in both \rontend/\ and \ackend/\ directories.
-
-Minimum variables:
-- \ackend/.env\: \DATABASE_URL\, \JWT_SECRET\, \PORT\, plus any third-party keys (e.g., \OPENAI_API_KEY\).
-- \rontend/.env\: \VITE_API_URL\ and optional UI configuration flags.
+For a containerized setup, run `docker-compose up --build` from the project root.
 
 Refer to \docs/REQUIREMENTS.md\ for the full configuration matrix.
 
-## npm Scripts
+GradeMaster Pro is deployed as two Vercel projects:
 
-### Frontend (\rontend/package.json\)
-- \
-pm run dev\ � start the Vite dev server
-- \
-pm run build\ � compile production assets
-- \
-pm run preview\ � preview the production build
+| Service | Vercel project root | URL |
+| --- | --- | --- |
+| Frontend | `frontend` | [grade-master-pro-frontend.vercel.app](https://grade-master-pro-frontend.vercel.app/) |
+| Backend API | `backend` | Set after backend deployment |
+
+See [QUICK_START.md](QUICK_START.md) for the short deployment path and [DEPLOYMENT_SEPARATE.md](DEPLOYMENT_SEPARATE.md) for database, environment variable, and troubleshooting details.
+
+Before the first production deployment, initialize the Prisma schema with `npx prisma db push` against the production `DATABASE_URL`.
+
+
+
+```powershell
+cd frontend
+npm run build
+
+cd ../backend
+npx prisma generate
+npm run build
+```
 
 ### Backend (\ackend/package.json\)
+
+- [Quick deployment guide](QUICK_START.md)
+- [Separate frontend and backend deployment guide](DEPLOYMENT_SEPARATE.md)
+- [Deployment notes](DEPLOYMENT.md)
+- [Project documentation](docs/README.md)
+
 - \
-pm run dev\ � run the API with hot reload
+pm run dev\ � run the API with hot reload
 - \
-pm run build\ � compile TypeScript to JavaScript
+pm run build\ � compile TypeScript to JavaScript
+
 - \
-pm start\ � launch the compiled server
+pm start\ � launch the compiled server
 
 ## Testing
 Add or update tests under \rontend/src/__tests__/\ and \ackend/src/__tests__/\, then execute:
