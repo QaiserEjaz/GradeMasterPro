@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useStore } from '../store/useStore';
 import {
   TrendingUp,
   Target,
@@ -84,6 +85,9 @@ const styles = `
 `;
 
 export default function Home() {
+  const user = useStore(state => state.user);
+  const setUser = useStore(state => state.setUser);
+  const navigate = useNavigate();
   const solutionPillars = [
     {
       title: "Unified grade intelligence",
@@ -269,6 +273,13 @@ export default function Home() {
       }
     };
 
+    const handleLogout = () => {
+      if (!window.confirm('Are you sure you want to log out?')) return;
+      localStorage.removeItem('token');
+      setUser(null);
+      navigate('/login');
+    };
+
     return (
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200/80">
         <nav className="px-4 sm:px-6 lg:px-8">
@@ -289,11 +300,11 @@ export default function Home() {
               </div>
             </div>
             <div className="hidden md:flex items-center gap-2">
-              <a href="#" className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200/60 hover:text-slate-900 transition-colors">Sign In</a>
-              <a href="#" className="group inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105">
-                Get started
+              {user ? <button type="button" onClick={handleLogout} className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200/60 hover:text-slate-900 transition-colors">Log out</button> : <Link to="/login" className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200/60 hover:text-slate-900 transition-colors">Sign In</Link>}
+              <Link to={user ? '/dashboard' : '/login'} className="group inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105">
+                {user ? 'Open dashboard' : 'Get started'}
                 <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </a>
+              </Link>
             </div>
             <div className="-mr-2 flex md:hidden">
               <button
@@ -318,8 +329,8 @@ export default function Home() {
               ))}
             </div>
             <div className="border-t border-slate-200 px-2 py-3 space-y-2">
-              <a href="#" className="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-200/80 hover:text-slate-900">Sign In</a>
-              <a href="#" className="block w-full text-left rounded-md bg-slate-900 px-3 py-2 text-base font-medium text-white">Get started</a>
+              {user ? <button type="button" onClick={handleLogout} className="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-200/80 hover:text-slate-900">Log out</button> : <Link to="/login" className="block w-full text-left rounded-md px-3 py-2 text-base font-medium text-slate-700 hover:bg-slate-200/80 hover:text-slate-900">Sign In</Link>}
+              <Link to={user ? '/dashboard' : '/login'} className="block w-full text-left rounded-md bg-slate-900 px-3 py-2 text-base font-medium text-white">{user ? 'Open dashboard' : 'Get started'}</Link>
             </div>
           </div>
         )}
