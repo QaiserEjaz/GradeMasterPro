@@ -5,7 +5,7 @@ import { useStore } from '../store/useStore';
 import { SemesterCard } from '../components/Calculator/SemesterCard';
 import { ResultsDisplay } from '../components/Calculator/ResultsDisplay';
 import { GradingSystemDetails } from '../components/Calculator/GradingSystemDetails';
-import { gradingAPI } from '../services/api';
+import { gradingAPI, calculationAPI } from '../services/api';
 import type { GradingSystem } from '../types';
 
 export function GradeCalculator() {
@@ -27,16 +27,22 @@ export function GradeCalculator() {
   const [availableSystems, setAvailableSystems] = useState<GradingSystem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const hasSemesters = semesters.length > 0;
   const [isGradingExpanded, setIsGradingExpanded] = useState(false);
 
   useEffect(() => {
     const loadSystems = async () => {
-      const systems = await gradingAPI.getSystems();
-      setAvailableSystems(systems);
-      if (systems.length > 0 && !gradingSystem) {
-        const defaultSystem = systems.find(system => system.id === 'USA_4_POINT') ?? systems[0];
-        setGradingSystem(defaultSystem ?? null);
+      try {
+        const systems = await gradingAPI.getSystems();
+        setAvailableSystems(systems);
+        if (systems.length > 0 && !gradingSystem) {
+          const defaultSystem = systems.find(system => system.id === 'USA_4_POINT') ?? systems[0];
+          setGradingSystem(defaultSystem ?? null);
+        }
+      } catch (error) {
+        console.warn('Failed to load grading systems', error);
+        setErrorMessage('Unable to load grading systems. The default static system is being used.');
       }
     };
     loadSystems();
@@ -48,39 +54,38 @@ export function GradeCalculator() {
 
   const handleSave = async () => {
     if (!currentCalculation || !gradingSystem) return;
-    
+
     setLoading(true);
+    setErrorMessage(null);
+
     try {
-      const response = await fetch('/api/calculations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          title: currentCalculation.title,
-          gradingSystem: gradingSystem.id,
-          semesters: semesters.map(s => ({
-            semesterNumber: s.semesterNumber,
-            semesterName: s.semesterName,
-            year: s.year,
-            courses: s.courses.map(c => ({
-              courseName: c.courseName,
-              courseCode: c.courseCode,
-              credits: c.credits,
-              gradeValue: c.gradeValue,
-              category: c.category
-            }))
-          }))
-        })
+      const saved = await calculationAPI.create({
+        title: currentCalculation.title,
+        gradingSystem: gradingSystem.id,
+        totalCredits: currentCalculation.totalCredits,
+        semesters: semesters.map((s) => ({
+          semesterNumber: s.semesterNumber,
+          semesterName: s.semesterName,
+          year: s.year,
+          credits: s.credits,
+          courses: s.courses.map((c) => ({
+            courseName: c.courseName,
+            courseCode: c.courseCode,
+            credits: c.credits,
+            gradeValue: c.gradeValue,
+            category: c.category,
+          })),
+        })),
       });
-      
-      if (response.ok) {
+
+      if (saved) {
         alert('Calculation saved successfully!');
       } else {
-        alert('Failed to save calculation');
+        setErrorMessage('Failed to save calculation. Please try again later.');
       }
     } catch (error) {
+      console.error('Save calculation failed', error);
+      setErrorMessage('Error saving calculation. Please try again.');
       alert('Error saving calculation');
     } finally {
       setLoading(false);
@@ -93,16 +98,16 @@ export function GradeCalculator() {
   };
 
   return (
-    <div className="bg-slate-50">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col px-4 pb-12 pt-6 sm:px-6 lg:px-6 lg:pt-6">
-          <header className="mb-8 rounded-3xl border border-slate-200 bg-gradient-to-r from-slate-50 via-white to-slate-100 p-6 shadow-sm sm:p-8 lg:mb-6 lg:flex lg:items-center lg:justify-between">
-            <div className="max-w-3xl space-y-3">
-              <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">Grade Calculator</h1>
-              <p className="text-sm text-slate-600 sm:text-base">
+    <div className='min-h-0'>
+      <div className="mx-auto flex w-full flex-col gap-6 px-4 py-5 sm:px-5 lg:px-8">
+          <header className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-3xl space-y-2">
+              <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Grade Calculator</h1>
+              <p className="text-sm text-slate-500 sm:text-base">
                 Build multi-semester academic plans, switch between international grading systems, and instantly review quality points and GPA outcomes.
               </p>
             </div>
-            <div className="mt-6 flex flex-wrap gap-2.5 text-xs text-slate-500 lg:mt-0 lg:justify-end">
+            <div className="flex flex-wrap gap-2 text-xs text-slate-500 lg:justify-end">
               <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 shadow-sm">
                 <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden /> Real-time calculations
               </span>
@@ -112,7 +117,12 @@ export function GradeCalculator() {
             </div>
           </header>
 
-        <div className="flex flex-1 flex-col gap-5 md:gap-6 lg:gap-5">
+        <div className="flex flex-1 flex-col gap-4 lg:gap-4">
+          {errorMessage && (
+            <div className="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              {errorMessage}
+            </div>
+          )}
           {currentCalculation && (
             <ResultsDisplay
               results={{
@@ -127,15 +137,15 @@ export function GradeCalculator() {
             />
           )}
 
-          <div className="grid gap-5 md:gap-5 lg:gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] lg:items-start">
-            <section className="flex flex-col gap-5">
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:flex-none">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="grid gap-4 md:gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] lg:items-start">
+            <section className="flex flex-col gap-4">
+              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm lg:flex-none">
+                <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <h2 className="text-lg font-semibold text-slate-900">Quick Actions</h2>
                     <p className="mt-1 text-xs text-slate-500">Calculate, save, or reset your academic plan.</p>
                   </div>
-                  <div className="flex flex-col gap-3 sm:flex-row sm:gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                     <button
                       onClick={handleCalculate}
                       className="rounded-lg bg-emerald-500 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-300"
@@ -160,8 +170,8 @@ export function GradeCalculator() {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm lg:min-h-[420px]">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 lg:flex-none">
+              <div className="flex flex-col rounded-xl border border-slate-200 bg-white shadow-sm lg:min-h-[380px]">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 lg:flex-none">
                   <div>
                     <h2 className="text-lg font-semibold text-slate-900">Semesters</h2>
                     <p className="text-xs text-slate-500">Manage courses by term and compare credit loads.</p>
@@ -174,9 +184,9 @@ export function GradeCalculator() {
                     Add Semester
                   </button>
                 </div>
-                <div className="flex-1 overflow-y-auto px-5 py-4 lg:py-5">
+                <div className="flex-1 overflow-y-auto px-4 py-3 lg:py-4">
                   {hasSemesters ? (
-                    <div className="flex flex-col gap-4 pb-2">
+                    <div className="flex flex-col gap-3 pb-2">
                       {semesters.map((semester, index) => (
                         <SemesterCard
                           key={semester.id || index}
@@ -191,7 +201,7 @@ export function GradeCalculator() {
                       ))}
                     </div>
                   ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 sm:p-8 text-center text-sm text-slate-500">
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-5 sm:p-6 text-center text-sm text-slate-500">
                       <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-3xl text-blue-500 shadow-sm">＋</span>
                       <p className="font-medium">No semesters yet</p>
                       <p className="max-w-md text-xs text-slate-500">Create your first semester to begin tracking courses, credits, and GPA metrics.</p>
@@ -201,8 +211,8 @@ export function GradeCalculator() {
               </div>
             </section>
 
-            <aside className="space-y-5 lg:sticky lg:top-28 lg:space-y-4">
-              <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:min-h-[420px]">
+            <aside className="space-y-4 lg:sticky lg:top-28 lg:space-y-4">
+              <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm lg:min-h-[380px]">
                 <Dropdown
                   label="Grading System"
                   value={gradingSystem?.id || ''}
@@ -217,7 +227,7 @@ export function GradeCalculator() {
                   }))}
                 />
                 {gradingSystem && (
-                  <div className="mt-2 flex flex-1 flex-col space-y-2 text-xs text-slate-600">
+                  <div className="mt-3 space-y-3 text-xs text-slate-600">
                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
                       <div>
                         <p className="text-sm font-semibold text-slate-800">{gradingSystem.name}</p>
@@ -241,7 +251,7 @@ export function GradeCalculator() {
                       <span>{isGradingExpanded ? 'Hide grading scale' : 'View grading scale'}</span>
                       <span aria-hidden>{isGradingExpanded ? '−' : '+'}</span>
                     </button>
-                    <div className={`${isGradingExpanded ? 'block' : 'hidden'} lg:flex-1 lg:block lg:overflow-y-auto`}>
+                    <div className={`${isGradingExpanded ? 'block' : 'hidden'} lg:block`}>
                       <GradingSystemDetails system={gradingSystem} />
                     </div>
                   </div>

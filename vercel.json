@@ -1,0 +1,14 @@
+{
+  "note": "This is a monorepo with separate frontend and backend deployments. See DEPLOYMENT_SEPARATE.md for instructions.",
+  "deploymentStrategy": "separate",
+  "frontend": {
+    "root": "frontend",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist"
+  },
+  "backend": {
+    "root": "backend",
+    "buildCommand": "npm run build && npx prisma generate",
+    "handler": "api/index.ts"
+  }
+}

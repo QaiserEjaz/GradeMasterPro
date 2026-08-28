@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -14,7 +14,11 @@ export async function register(req: Request, res: Response) {
     }
     const hash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({ data: { email, password: hash, name } });
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRY || '7d' });
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET as Secret,
+      { expiresIn: (process.env.JWT_EXPIRY || '7d') as SignOptions['expiresIn'] }
+    );
     res.status(201).json({ success: true, user: { id: user.id, email: user.email, name: user.name }, token });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Internal server error' });
@@ -32,7 +36,11 @@ export async function login(req: Request, res: Response) {
     if (!ok) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRY || '7d' });
+    const token = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET as Secret,
+      { expiresIn: (process.env.JWT_EXPIRY || '7d') as SignOptions['expiresIn'] }
+    );
     res.json({ success: true, token, user: { id: user.id, email: user.email, name: user.name } });
   } catch (err) {
     res.status(500).json({ success: false, error: 'Internal server error' });
