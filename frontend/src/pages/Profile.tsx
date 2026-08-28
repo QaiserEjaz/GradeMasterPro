@@ -1,4 +1,8 @@
+import { useStore } from '../store/useStore';
+
 export default function Profile() {
+  const user = useStore(state => state.user);
+
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-4 px-4 py-10 sm:px-6 lg:px-8">
       <div className="space-y-2">
@@ -11,7 +15,7 @@ export default function Profile() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900">Account Basics</h2>
           <p className="mt-2 text-sm text-slate-600">
-            Update your name, institution, and primary email address so collaborators recognise your workspace.
+            {user ? `${user.name} - ${user.email}` : 'Sign in to manage your account details.'}
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

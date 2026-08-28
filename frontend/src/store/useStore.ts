@@ -19,13 +19,29 @@ interface Store {
   clearCalculation: () => void;
 }
 
+const getStoredUser = (): User | null => {
+  try {
+    const storedUser = localStorage.getItem('user');
+    return storedUser ? JSON.parse(storedUser) as User : null;
+  } catch {
+    return null;
+  }
+};
+
 export const useStore = create<Store>((set, get) => ({
-  user: null,
+  user: getStoredUser(),
   currentCalculation: null,
   gradingSystem: null,
   semesters: [],
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+    set({ user });
+  },
   setCalculation: (calc) => set({ currentCalculation: calc }),
   setGradingSystem: (system) => set({ gradingSystem: system }),
 
