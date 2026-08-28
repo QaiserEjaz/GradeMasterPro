@@ -32,7 +32,7 @@
      ```
    - Click **Save** → Re-deploy
 
-5. **Copy Backend URL**: `https://grademaster-backend.vercel.app`
+5. **Copy your Backend URL** from the Vercel project dashboard.
 
 ✅ **Backend Running!**
 
@@ -47,10 +47,10 @@
    - Click **Deploy**
 
 4. **After deployment**, go to **Settings > Environment Variables**
-   - Add `VITE_API_URL` → `https://grademaster-backend.vercel.app/api`
+   - Add `VITE_API_URL` → `https://YOUR-BACKEND-URL.vercel.app/api`
    - Click **Save** → Re-deploy
 
-5. **Copy Frontend URL**: `https://grademaster-frontend.vercel.app`
+5. Your live frontend is: `https://grade-master-pro-frontend.vercel.app/`
 
 ✅ **Frontend Running!**
 
@@ -61,7 +61,7 @@
 From your **local terminal**:
 ```bash
 cd backend
-npx prisma migrate deploy
+npx prisma db push
 ```
 
 ✅ **All Done!**
@@ -72,9 +72,9 @@ npx prisma migrate deploy
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | https://grademaster-frontend.vercel.app |
-| **Backend API** | https://grademaster-backend.vercel.app/api |
-| **Health Check** | https://grademaster-backend.vercel.app/api/health |
+| **Frontend** | https://grade-master-pro-frontend.vercel.app/ |
+| **Backend API** | YOUR-BACKEND-URL.vercel.app/api |
+| **Health Check** | YOUR-BACKEND-URL.vercel.app/api/health |
 
 ---
 
@@ -84,7 +84,7 @@ npx prisma migrate deploy
 |-------|----------|
 | **Frontend shows 404** | Check `VITE_API_URL` in frontend settings, re-deploy |
 | **API connection fails** | Verify `DATABASE_URL` in backend settings |
-| **Database error** | Run `npx prisma migrate deploy` locally, then re-deploy backend |
+| **Database error** | Set `DATABASE_URL`, then run `npx prisma db push` locally |
 | **CORS error** | Update `backend/src/app.ts` with frontend URL, commit & push |
 
 ---
@@ -114,7 +114,7 @@ VITE_API_URL=http://localhost:3000/api
 
 ## Next: Test Your App
 
-1. Visit **https://grademaster-frontend.vercel.app**
+1. Visit **https://grade-master-pro-frontend.vercel.app/**
 2. Register a new account
 3. Try calculating grades
 

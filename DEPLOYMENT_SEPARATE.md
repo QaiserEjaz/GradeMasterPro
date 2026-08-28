@@ -79,7 +79,7 @@ Your backend needs its own `vercel.json`:
 ### 2.4 Get Backend URL
 After deploy, your backend URL will be:
 ```
-https://grademaster-backend.vercel.app/api
+https://YOUR-BACKEND-URL.vercel.app/api
 ```
 **Copy this!** You'll need it for frontend.
 
@@ -97,7 +97,7 @@ Your frontend needs its own `vercel.json`:
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "env": {
-    "VITE_API_URL": "@backend_url"
+    "VITE_API_URL": "https://YOUR-BACKEND-URL.vercel.app/api"
   }
 }
 ```
@@ -116,14 +116,14 @@ Your frontend needs its own `vercel.json`:
 
 | Variable | Value |
 |----------|-------|
-| `VITE_API_URL` | https://grademaster-backend.vercel.app/api |
+| `VITE_API_URL` | https://YOUR-BACKEND-URL.vercel.app/api |
 
 4. Click **Re-deploy** to apply changes
 
 ### 3.4 Get Frontend URL
 Your frontend will be available at:
 ```
-https://grademaster-frontend.vercel.app
+https://grade-master-pro-frontend.vercel.app/
 ```
 
 ---
@@ -136,7 +136,7 @@ Once backend is deployed and DATABASE_URL is set, run:
 **Option A: Local Terminal (if Vercel Postgres allows)**
 ```bash
 cd backend
-npx prisma migrate deploy
+npx prisma db push
 ```
 
 **Option B: Via Vercel CLI**
@@ -150,7 +150,7 @@ npx prisma migrate deploy
 Edit `backend/vercel.json`:
 ```json
 {
-  "buildCommand": "npm install && npx prisma migrate deploy && npm run build"
+  "buildCommand": "npm install && npx prisma db push && npm run build"
 }
 ```
 
@@ -163,7 +163,7 @@ Update CORS to allow only your frontend:
 ```typescript
 app.use(cors({
   origin: [
-    'https://grademaster-frontend.vercel.app',
+    'https://grade-master-pro-frontend.vercel.app',
     'http://localhost:5173'  // Local dev
   ],
   credentials: true
@@ -183,8 +183,8 @@ git push origin main
 
 | Service | URL |
 |---------|-----|
-| **Frontend** | https://grademaster-frontend.vercel.app |
-| **Backend API** | https://grademaster-backend.vercel.app/api |
+| **Frontend** | https://grade-master-pro-frontend.vercel.app/ |
+| **Backend API** | YOUR-BACKEND-URL.vercel.app/api |
 | **Database** | Vercel Postgres (managed) |
 | **GitHub** | https://github.com/QaiserEjaz/GradeMasterPro |
 
@@ -202,7 +202,7 @@ NODE_ENV=production
 
 ### Frontend Project (Vercel)
 ```
-VITE_API_URL=https://grademaster-backend.vercel.app/api
+VITE_API_URL=https://YOUR-BACKEND-URL.vercel.app/api
 ```
 
 ### Local Development
