@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "buildCommand": "npm install --prefix ./frontend && npm run build --prefix ./frontend && npm install --prefix ./backend",
+  "outputDirectory": "./frontend/dist",
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "JWT_SECRET": "@jwt_secret",
+    "PORT": "3000"
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
