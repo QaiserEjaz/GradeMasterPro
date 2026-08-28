@@ -1,25 +1,14 @@
 {
-  "version": 2,
-  "buildCommand": "npm install --prefix ./frontend && npm run build --prefix ./frontend && npm install --prefix ./backend",
-  "outputDirectory": "./frontend/dist",
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "JWT_SECRET": "@jwt_secret",
-    "PORT": "3000"
+  "note": "This is a monorepo with separate frontend and backend deployments. See DEPLOYMENT_SEPARATE.md for instructions.",
+  "deploymentStrategy": "separate",
+  "frontend": {
+    "root": "frontend",
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist"
   },
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "backend": {
+    "root": "backend",
+    "buildCommand": "npm run build && npx prisma generate",
+    "handler": "api/index.ts"
+  }
 }
