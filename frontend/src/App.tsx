@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState, type ReactNode } from 'react';
-import { Link, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useNavigate, useLocation } from 'react-router-dom';
 import { GradeCalculator } from './pages/GradeCalculator';
 import { FloatingCalculator } from './components/FloatingCalculator';
 import Home from './pages/Home';
@@ -238,10 +238,13 @@ export default function App() {
           <Route path="/meeting-agenda" element={<Shell showSidebar={true}><MeetingAgenda /></Shell>} />
           <Route path="/contact" element={<Shell showSidebar={true} showFloatingCalculator={false}><Contact /></Shell>} />
           <Route path="/support/ticket" element={<Shell showSidebar={false} showFloatingCalculator={false}><SupportTicket /></Shell>} />
-          <Route path="/sales/demo" element={<Shell showSidebar={false} showFloatingCalculator={false}><SalesDemo /></Shell>} />
+          <Route path="/support" element={<Navigate to="/support/ticket" replace />} />
+          <Route path="/sales-demo" element={<Shell showSidebar={false} showFloatingCalculator={false}><SalesDemo /></Shell>} />
+          <Route path="/sales/demo" element={<Navigate to="/sales-demo" replace />} />
           <Route path="/profile" element={<Shell showSidebar={true} showFloatingCalculator={false}><Profile /></Shell>} />
           <Route path="/settings" element={<Shell showSidebar={true} showFloatingCalculator={false}><SettingsPage /></Shell>} />
           <Route path="/status" element={<Shell showSidebar={false} showFloatingCalculator={false}><Status /></Shell>} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
 

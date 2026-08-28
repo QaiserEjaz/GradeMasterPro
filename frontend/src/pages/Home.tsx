@@ -376,7 +376,7 @@ export default function Home() {
                     Try the calculator
                   </Link>
                   <Link
-                    to="/sales/demo"
+                    to="/sales-demo"
                     className="inline-flex items-center gap-2 rounded-lg border border-transparent px-4 py-2 text-sm font-semibold text-blue-600 transition-all hover:bg-blue-50 hover:text-blue-700"
                   >
                     <Play className="h-3 w-3" />

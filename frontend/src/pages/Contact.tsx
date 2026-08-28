@@ -29,7 +29,7 @@ export default function Contact() {
               <p className="mt-2 text-sm text-slate-600">
                 Interested in enterprise subscriptions or campus-wide deployment? Schedule time with our partnerships team.
               </p>
-              <Link to="/sales/demo" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700">
+              <Link to="/sales-demo" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700">
                 Book a demo →
               </Link>
             </div>

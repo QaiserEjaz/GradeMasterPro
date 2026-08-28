@@ -5,7 +5,7 @@ import { useStore } from '../store/useStore';
 import { SemesterCard } from '../components/Calculator/SemesterCard';
 import { ResultsDisplay } from '../components/Calculator/ResultsDisplay';
 import { GradingSystemDetails } from '../components/Calculator/GradingSystemDetails';
-import { gradingAPI } from '../services/api';
+import { gradingAPI, calculationAPI } from '../services/api';
 import type { GradingSystem } from '../types';
 
 export function GradeCalculator() {
@@ -27,16 +27,22 @@ export function GradeCalculator() {
   const [availableSystems, setAvailableSystems] = useState<GradingSystem[]>([]);
   const [loading, setLoading] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const hasSemesters = semesters.length > 0;
   const [isGradingExpanded, setIsGradingExpanded] = useState(false);
 
   useEffect(() => {
     const loadSystems = async () => {
-      const systems = await gradingAPI.getSystems();
-      setAvailableSystems(systems);
-      if (systems.length > 0 && !gradingSystem) {
-        const defaultSystem = systems.find(system => system.id === 'USA_4_POINT') ?? systems[0];
-        setGradingSystem(defaultSystem ?? null);
+      try {
+        const systems = await gradingAPI.getSystems();
+        setAvailableSystems(systems);
+        if (systems.length > 0 && !gradingSystem) {
+          const defaultSystem = systems.find(system => system.id === 'USA_4_POINT') ?? systems[0];
+          setGradingSystem(defaultSystem ?? null);
+        }
+      } catch (error) {
+        console.warn('Failed to load grading systems', error);
+        setErrorMessage('Unable to load grading systems. The default static system is being used.');
       }
     };
     loadSystems();
@@ -48,39 +54,38 @@ export function GradeCalculator() {
 
   const handleSave = async () => {
     if (!currentCalculation || !gradingSystem) return;
-    
+
     setLoading(true);
+    setErrorMessage(null);
+
     try {
-      const response = await fetch('/api/calculations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          title: currentCalculation.title,
-          gradingSystem: gradingSystem.id,
-          semesters: semesters.map(s => ({
-            semesterNumber: s.semesterNumber,
-            semesterName: s.semesterName,
-            year: s.year,
-            courses: s.courses.map(c => ({
-              courseName: c.courseName,
-              courseCode: c.courseCode,
-              credits: c.credits,
-              gradeValue: c.gradeValue,
-              category: c.category
-            }))
-          }))
-        })
+      const saved = await calculationAPI.create({
+        title: currentCalculation.title,
+        gradingSystem: gradingSystem.id,
+        totalCredits: currentCalculation.totalCredits,
+        semesters: semesters.map((s) => ({
+          semesterNumber: s.semesterNumber,
+          semesterName: s.semesterName,
+          year: s.year,
+          credits: s.credits,
+          courses: s.courses.map((c) => ({
+            courseName: c.courseName,
+            courseCode: c.courseCode,
+            credits: c.credits,
+            gradeValue: c.gradeValue,
+            category: c.category,
+          })),
+        })),
       });
-      
-      if (response.ok) {
+
+      if (saved) {
         alert('Calculation saved successfully!');
       } else {
-        alert('Failed to save calculation');
+        setErrorMessage('Failed to save calculation. Please try again later.');
       }
     } catch (error) {
+      console.error('Save calculation failed', error);
+      setErrorMessage('Error saving calculation. Please try again.');
       alert('Error saving calculation');
     } finally {
       setLoading(false);
@@ -113,6 +118,11 @@ export function GradeCalculator() {
           </header>
 
         <div className="flex flex-1 flex-col gap-4 lg:gap-4">
+          {errorMessage && (
+            <div className="rounded-xl border border-rose-300 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              {errorMessage}
+            </div>
+          )}
           {currentCalculation && (
             <ResultsDisplay
               results={{
